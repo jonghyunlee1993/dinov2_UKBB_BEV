@@ -7,6 +7,7 @@ import logging
 from enum import Enum
 from typing import Any, Callable, List, Optional, TypeVar
 
+from dinov2.data.datasets.ukbbev import UKBBEV
 import torch
 from torch.utils.data import Sampler
 
@@ -58,6 +59,10 @@ def _parse_dataset_str(dataset_str: str):
             kwargs["split"] = ImageNet.Split[kwargs["split"]]
     elif name == "ImageNet22k":
         class_ = ImageNet22k
+    elif name == "UKBBEV":
+        class_ = UKBBEV
+        if "split" in kwargs:
+            kwargs["split"] = UKBBEV.Split[kwargs["split"]]
     else:
         raise ValueError(f'Unsupported dataset "{name}"')
 
@@ -84,6 +89,7 @@ def make_dataset(
     logger.info(f'using dataset: "{dataset_str}"')
 
     class_, kwargs = _parse_dataset_str(dataset_str)
+    logger.info(str(kwargs))
     dataset = class_(transform=transform, target_transform=target_transform, **kwargs)
 
     logger.info(f"# of dataset samples: {len(dataset):,d}")
